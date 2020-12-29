@@ -5,6 +5,8 @@ import reportWebVitals from './reportWebVitals';
 
 
 var randInt = 0
+var selected = 0
+
 const Button = ({ onClick, text }) => (
     <button onClick={onClick}>
         {text}
@@ -24,7 +26,7 @@ function getRandomInRange(min, max) {
     max = Math.floor(max)
     var randNumber = Math.floor(Math.random() * (max - min) + min)
     while (randInt === randNumber) {
-        getRandomInRange(min, max)
+        randNumber = Math.floor(Math.random() * (max - min) + min)
     }
     randInt = randNumber
     return randNumber
@@ -38,15 +40,25 @@ anecdotes.set(4, { anecdote: "Premature optimization is the root of all evil.", 
 anecdotes.set(5, { anecdote: "Debugging is twice as hard as writing the code in the first place.Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.", votes: 0 })
 
 const App = () => {
-    //const [selected, setSelected] = useState(0)
-    const [randomAnecdote, setRandomAnecdote] = useState(anecdotes.get(getRandomInRange(0, anecdotes.size)))
-    const [vote, setVote] = useState(0)
+    const [state, setState] = useState(anecdotes)
+    const [randomAnecdote, setRandomAnecdote] = useState(anecdotes.get(selected))
 
-    const getRandomAnecdote = () => /*getRandomInRange(0, anecdotes.size)*/setRandomAnecdote(anecdotes.get(getRandomInRange(0, anecdotes.size)))
+    const upsert = (key, value) => {
+        const newMap = new Map(state)
+        newMap.set(key, {anecdote: randomAnecdote.anecdote, votes: randomAnecdote.votes})
+        setState(new Map(newMap))
+    }
+
+    const getRandomAnecdote = () => {
+        selected = getRandomInRange(0, state.size)
+        setRandomAnecdote(state.get(selected))
+    }
 
     const voteForAnecdote = () => {
         randomAnecdote.votes += 1
-        setVote(randomAnecdote.votes)
+        var randanecdote = randomAnecdote.anecdote
+        var randanecdotevote = randomAnecdote.votes
+        upsert(selected, { randanecdote, randanecdotevote})
     }
     return (
         <div>
@@ -69,9 +81,7 @@ const anecdotes = [
 ]
 */
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+    <App />,
   document.getElementById('root')
 );
 
